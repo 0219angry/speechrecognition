@@ -4,5 +4,6 @@ SpeechRecognition
 requests
 pyaudio
 pydub
+time
 
 ###### Requirements with Version Specifiers ######
