@@ -6,10 +6,7 @@ import datetime
 
 dir = "data/wav/"
 
-def recognize():
-  print("Enter 青空朗読 contents number (#### in aozoraroudoku.jp/voice/rdp/rd####.html)")
-  number = input()
-
+def recognize(number):
   sprec = sr.Recognizer()
 
   print(f"[{datetime.datetime.now()}] {dir}rd{number} ========\n")
@@ -21,5 +18,3 @@ def recognize():
     f.write(script)
   print(script)
 
-
-recognize()

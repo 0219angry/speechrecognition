@@ -2,11 +2,11 @@ import requests
 from bs4 import BeautifulSoup
 
 # 無視する文字の一覧
-ignore_letters =  ["。","、","\n","\t"," ","　","○","「","」","（","）","-","―","！","!","？","?"]
+ignore_letters =  ["。","、","\n","\t","\r"," ","　","○","「","」","（","）","-","―","！","!","？","?"]
 
 
 
-def calc_accuracy(ans, rec):
+def calc_accuracy(number, ans, rec):
   N = len(ans) # 正解文の長さ
   delection_error = 0 # 削除誤り
   substitution_error = 0 # 置換誤り
@@ -18,11 +18,15 @@ def calc_accuracy(ans, rec):
   error_encount_ans = None # 直近の誤り発生地点(正解文)
   error_encount_rec = None # 直近の誤り発生地点(認識文)
   
+  f = open("data/acc/"+"rd"+number+".csv",'w')
+  f.write("type, answer, recognized, anser_pos, recognized_pos\n")
+  
   while c_ans < N:
     if error_encount == True:
       # 正解文を進める(削除誤り)
       while c_ans < len(ans) and ans[c_ans] != rec[c_rec]:
-        print(f"<D>[{ans[c_ans]}] <=> [{rec[c_rec]}] {c_ans}|{c_rec}")
+        # print(f"<D>[{ans[c_ans]}] <=> [{rec[c_rec]}] {c_ans}|{c_rec}")
+        f.write(f"Delection, {ans[c_ans]}, {rec[c_rec]}, {c_ans}, {c_rec}\n")
         c_ans += 1
         
       d = c_ans - error_encount_ans
@@ -30,7 +34,8 @@ def calc_accuracy(ans, rec):
       
       # 認識文を進める(挿入誤り)
       while c_rec < len(rec) and ans[c_ans] != rec[c_rec]:
-        print(f"<I>[{ans[c_ans]}] <=> [{rec[c_rec]}] {c_ans}|{c_rec}")
+        # print(f"<I>[{ans[c_ans]}] <=> [{rec[c_rec]}] {c_ans}|{c_rec}")
+        f.write(f"Insertion, {ans[c_ans]}, {rec[c_rec]}, {c_ans}, {c_rec}\n")
         c_rec += 1
         
       i = c_rec - error_encount_rec
@@ -38,7 +43,8 @@ def calc_accuracy(ans, rec):
       
       # どちらも進める(置換誤り)
       while c_rec < len(rec) and c_ans < len(ans) and ans[c_ans] != rec[c_rec]:
-        print(f"<S>[{ans[c_ans]}] <=> [{rec[c_rec]}] {c_ans}|{c_rec}")
+        # print(f"<S>[{ans[c_ans]}] <=> [{rec[c_rec]}] {c_ans}|{c_rec}")
+        f.write(f"Substitution, {ans[c_ans]}, {rec[c_rec]}, {c_ans}, {c_rec}\n")
         c_rec += 1
         c_ans += 1
       s = c_rec - error_encount_rec
@@ -50,46 +56,52 @@ def calc_accuracy(ans, rec):
         insertion_error += i
         c_rec = c_rec + i
         error_encount = False
-        print(f"insertion error detected: {i} letter(s).")
+        # print(f"insertion error detected: {i} letter(s).")
+        
       elif d <= i and d <= s: # 削除誤り
         delection_error += d
         c_ans = c_ans + d
         error_encount = False
-        print(f"delection error detected: {d} letter(s).")
+        # print(f"delection error detected: {d} letter(s).")
+        
       else: # 置換誤り
         substitution_error += s
         c_ans = c_ans + s
         c_rec = c_rec + s
         error_encount = False
-        print(f"substitution error detected: {s} letter(s).")
+        # print(f"substitution error detected: {s} letter(s).")
     
     # 正解文の終端に来たのに認識文が残っているときは挿入誤り    
     if c_ans == len(ans):
       i = len(rec)-c_rec-1
       insertion_error += i
-      print(f"insertion error detected: {i} letter(s).")
+      # print(f"insertion error detected: {i} letter(s).")
       break
     
     # 認識文の終端に来たのに正解文が残っているときは削除誤り
     if c_rec == len(rec):
       d = len(ans)-c_ans-1
       delection_error += d
-      print(f"delection error detected: {d} letter(s).")
+      # print(f"delection error detected: {d} letter(s).")
       break
       
         
     if ans[c_ans] != rec[c_rec] and error_encount == False:
       print(f"<E>[{ans[c_ans]}] <=> [{rec[c_rec]}] {c_ans}|{c_rec}")
+      f.write(f"Error, {ans[c_ans]}, {rec[c_rec]}, {c_ans}, {c_rec}\n")
       error_encount = True
       error_encount_ans = c_ans
       error_encount_rec = c_rec
       continue
     
     if ans[c_ans] == rec[c_rec]:
-      print(f"<C>[{ans[c_ans]}] <=> [{rec[c_rec]}] {c_ans}|{c_rec}")
+      # print(f"<C>[{ans[c_ans]}] <=> [{rec[c_rec]}] {c_ans}|{c_rec}")
+      f.write(f"Correct, {ans[c_ans]}, {rec[c_rec]}, {c_ans}, {c_rec}\n")
       c_ans += 1
       c_rec += 1
   
+  
+  f.close()
   print(f"全文字数: {N}")
   print(f"削除誤り: {delection_error}")
   print(f"置換誤り: {substitution_error}")    
@@ -99,11 +111,7 @@ def calc_accuracy(ans, rec):
   
 
 
-def accuracy():
-  print("Enter 青空朗読 contents number (#### in aozoraroudoku.jp/voice/rdp/rd####.html)")
-  number = input()
-  print("Enter 青空文庫 contents url")
-  url = input()
+def accuracy(number, url):
   
   response = requests.get(url)
   
@@ -115,6 +123,9 @@ def accuracy():
   
   answer_text = main_text.get_text()
   
+  with open("data/answer/rd"+number+".txt","w") as f:
+    f.write(answer_text)
+  
   with open("data/txt/"+"rd"+number+".txt",'r') as f:
     recognized_text = f.read()
     
@@ -125,7 +136,8 @@ def accuracy():
       print(l,end="")
       formatted_answer.append(l)
       
-  print("\n")
+
+  print()
   
   formatted_recog_text = []
   
@@ -133,12 +145,6 @@ def accuracy():
     if l not in ignore_letters:
       print(l,end="")
       formatted_recog_text.append(l)
-  print("\n")
+  print()
   
-  calc_accuracy(formatted_answer, formatted_recog_text)
-  
-  
-
-print(calc_accuracy("本日もご利用いただきありがとうございます","本日もご利用ありがとうございました"))
-    
-# accuracy()
+  calc_accuracy(number, formatted_answer, formatted_recog_text)

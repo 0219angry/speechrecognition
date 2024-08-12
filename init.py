@@ -13,5 +13,13 @@ def init():
     os.makedirs("data/txt")
   except FileExistsError:
     pass
+  try:
+    os.makedirs("data/acc")
+  except FileExistsError:
+    pass
+  try:
+    os.makedirs("data/answer")
+  except FileExistsError:
+    pass
     
 init()

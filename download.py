@@ -1,11 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 
-def download():
+def download(number):
   url = 'https://aozoraroudoku.jp/voice/'
-
-  print("Enter 青空朗読 contents number (#### in aozoraroudoku.jp/voice/rdp/rd####.html)")
-  number = input()
 
   url_data = requests.get(url+'mp3/rd'+number+'.mp3').content
 
@@ -19,4 +16,3 @@ def download():
   title = soup.title.string
   print("Download file from \""+title+"\"")
   
-download()
