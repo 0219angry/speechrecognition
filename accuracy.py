@@ -18,88 +18,70 @@ def calc_accuracy(number, ans, rec):
   error_encount_ans = None # 直近の誤り発生地点(正解文)
   error_encount_rec = None # 直近の誤り発生地点(認識文)
   
-  f = open("data/acc/"+"rd"+number+".csv",'w')
-  f.write("type, answer, recognized, anser_pos, recognized_pos\n")
+  great_c_ans_result = 0 # 現在最良の一致した地点(正解文)
+  great_c_rec_result = 0 # 現在最良の一致した地点(認識文)
   
+  f = open("data/acc/"+"rd"+number+".csv",'w')
+  f.write("error_type, answer, recognized, error_count, answer_start, answer_end, recog_start, recog_end\n")
+  
+  # 最小の誤り数でとれるものを採用する(そうしないと同じ文字があった時不適切な文字同士を同じものとみなす可能性がある)
   while c_ans < N:
     if error_encount == True:
-      # 正解文を進める(削除誤り)
-      while c_ans < len(ans) and ans[c_ans] != rec[c_rec]:
-        # print(f"<D>[{ans[c_ans]}] <=> [{rec[c_rec]}] {c_ans}|{c_rec}")
-        f.write(f"Delection, {ans[c_ans]}, {rec[c_rec]}, {c_ans}, {c_rec}\n")
+      error_letter_count = 100000
+      while c_ans < len(ans):
+        while c_rec < len(rec):
+          if ans[c_ans] == rec[c_rec] and error_letter_count > max(c_rec-error_encount_rec, c_ans-error_encount_ans)-1:
+            error_letter_count = max(c_rec-error_encount_rec, c_ans-error_encount_ans)-1
+            great_c_ans_result = c_ans
+            great_c_rec_result = c_rec
+            break
+          c_rec += 1
+        c_rec = error_encount_rec
         c_ans += 1
-        
-      d = c_ans - error_encount_ans
-      c_ans = error_encount_ans
-      
-      # 認識文を進める(挿入誤り)
-      while c_rec < len(rec) and ans[c_ans] != rec[c_rec]:
-        # print(f"<I>[{ans[c_ans]}] <=> [{rec[c_rec]}] {c_ans}|{c_rec}")
-        f.write(f"Insertion, {ans[c_ans]}, {rec[c_rec]}, {c_ans}, {c_rec}\n")
-        c_rec += 1
-        
-      i = c_rec - error_encount_rec
-      c_rec = error_encount_rec
-      
-      # どちらも進める(置換誤り)
-      while c_rec < len(rec) and c_ans < len(ans) and ans[c_ans] != rec[c_rec]:
-        # print(f"<S>[{ans[c_ans]}] <=> [{rec[c_rec]}] {c_ans}|{c_rec}")
-        f.write(f"Substitution, {ans[c_ans]}, {rec[c_rec]}, {c_ans}, {c_rec}\n")
-        c_rec += 1
-        c_ans += 1
-      s = c_rec - error_encount_rec
-      c_rec = error_encount_rec
-      c_ans = error_encount_ans
-      
-      # 値が小さいほうを採用する
-      if i <= d and i <= s: # 挿入誤り 
-        insertion_error += i
-        c_rec = c_rec + i
-        error_encount = False
-        # print(f"insertion error detected: {i} letter(s).")
-        
-      elif d <= i and d <= s: # 削除誤り
-        delection_error += d
-        c_ans = c_ans + d
-        error_encount = False
-        # print(f"delection error detected: {d} letter(s).")
-        
+      if great_c_rec_result == error_encount_rec: # 削除誤り
+        delection_error += error_letter_count
+        f.write("delection, ")
+      elif great_c_ans_result == error_encount_ans: # 挿入誤り
+        f.write("insertion, ")
+        insertion_error += error_letter_count
       else: # 置換誤り
-        substitution_error += s
-        c_ans = c_ans + s
-        c_rec = c_rec + s
-        error_encount = False
-        # print(f"substitution error detected: {s} letter(s).")
+        f.write("substitution, ")
+        substitution_error += error_letter_count
+      
+      # 誤り内容をcsvに書き込み
+      f.write(f"{''.join(ans[error_encount_ans:great_c_ans_result])}, {''.join(rec[error_encount_rec:great_c_rec_result])}, ")
+      f.write(f"{error_letter_count}, {error_encount_ans}, {great_c_ans_result-1}, {error_encount_rec}, {great_c_rec_result-1}\n")
+      c_ans = great_c_ans_result
+      c_rec = great_c_rec_result
+      error_encount = False
+
+
     
     # 正解文の終端に来たのに認識文が残っているときは挿入誤り    
     if c_ans == len(ans):
       i = len(rec)-c_rec-1
       insertion_error += i
-      # print(f"insertion error detected: {i} letter(s).")
       break
     
     # 認識文の終端に来たのに正解文が残っているときは削除誤り
     if c_rec == len(rec):
       d = len(ans)-c_ans-1
       delection_error += d
-      # print(f"delection error detected: {d} letter(s).")
       break
       
-        
+    # 誤りに遭遇した
     if ans[c_ans] != rec[c_rec] and error_encount == False:
-      print(f"<E>[{ans[c_ans]}] <=> [{rec[c_rec]}] {c_ans}|{c_rec}")
-      f.write(f"Error, {ans[c_ans]}, {rec[c_rec]}, {c_ans}, {c_rec}\n")
+      # 正解していた部分をcsvに書き込み
+      f.write(f"correct, {''.join(ans[great_c_ans_result:c_ans])}, {''.join(rec[great_c_rec_result:c_rec])}, ")
+      f.write(f"0, {great_c_ans_result}, {c_ans-1}, {great_c_rec_result}, {c_rec-1}\n")
       error_encount = True
       error_encount_ans = c_ans
       error_encount_rec = c_rec
       continue
     
     if ans[c_ans] == rec[c_rec]:
-      # print(f"<C>[{ans[c_ans]}] <=> [{rec[c_rec]}] {c_ans}|{c_rec}")
-      f.write(f"Correct, {ans[c_ans]}, {rec[c_rec]}, {c_ans}, {c_rec}\n")
       c_ans += 1
       c_rec += 1
-  
   
   f.close()
   print(f"全文字数: {N}")
