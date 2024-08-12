@@ -82,6 +82,9 @@ def calc_accuracy(number, ans, rec):
     if ans[c_ans] == rec[c_rec]:
       c_ans += 1
       c_rec += 1
+      
+  f.write(f"correct, {''.join(ans[great_c_ans_result:c_ans])}, {''.join(rec[great_c_rec_result:c_rec])}, ")
+  f.write(f"0, {great_c_ans_result}, {c_ans-1}, {great_c_rec_result}, {c_rec-1}\n")
   
   f.close()
   print(f"全文字数: {N}")
