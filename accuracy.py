@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 # 無視する文字の一覧
-ignore_letters =  ["。","、","\n","\t"," ","　","○","「","」","（","）"]
+ignore_letters =  ["。","、","\n","\t"," ","　","○","「","」","（","）","-","―","！","!","？","?"]
 
 def accuracy():
   print("Enter 青空朗読 contents number (#### in aozoraroudoku.jp/voice/rdp/rd####.html)")
@@ -33,10 +33,10 @@ def accuracy():
   print("\n")
   
   
-  # for l in recognized_text:
-  #   if l not in ignore_letters:
-  #     print(l,end="")
-  # print("\n")
+  for l in recognized_text:
+    if l not in ignore_letters:
+      print(l,end="")
+  print("\n")
   
     
 accuracy()
