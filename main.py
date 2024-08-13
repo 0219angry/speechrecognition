@@ -27,7 +27,6 @@ def main():
   init()
   
   if short_mode == "n" or short_mode == "N":
-
     # 音声ファイルのダウンロード
     download(number)
 
@@ -35,7 +34,7 @@ def main():
     convert_one(number)
 
     # 音声認識(Google API)
-    recognize(number, engine_name)
+    recognize(number)
   
   if short_mode == "n" or short_mode == "N" or short_mode == "y" or short_mode == "Y":
     # 認識精度の計算

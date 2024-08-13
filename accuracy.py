@@ -87,11 +87,12 @@ def calc_accuracy(number, ans, rec, engine_name):
   f.write(f"0, {great_c_ans_result}, {c_ans-1}, {great_c_rec_result}, {c_rec-1}\n")
   
   f.close()
+  print(f"engine/API: {engine_name}")
   print(f"全文字数: {N}")
   print(f"削除誤り: {delection_error}")
   print(f"置換誤り: {substitution_error}")    
   print(f"挿入誤り: {insertion_error}")
-  print(f"accuracy: {(N-delection_error-substitution_error-insertion_error)/N} %")
+  print(f"accuracy: {(N-delection_error-substitution_error-insertion_error)/N*100} %")
   return (N-delection_error-substitution_error-insertion_error)/N
   
 
@@ -118,7 +119,6 @@ def accuracy(number, url,engine_name):
   
   for l in answer_text:
     if l not in ignore_letters:
-      print(l,end="")
       formatted_answer.append(l)
       
 
@@ -128,7 +128,6 @@ def accuracy(number, url,engine_name):
   
   for l in recognized_text:
     if l not in ignore_letters:
-      print(l,end="")
       formatted_recog_text.append(l)
   print()
   
