@@ -11,6 +11,9 @@ def main():
   number = input()
   print("Enter 青空文庫 contents url")
   url = input()
+
+  print("Do you want short mode? Short mode only calculate accuracy. [Y/n]")
+  short_mode = input()
   
   
   # 必要なディレクトリの作成
@@ -28,7 +31,7 @@ def main():
   
   if short_mode == "n" or short_mode == "N" or short_mode == "y" or short_mode == "Y":
     # 認識精度の計算
-    accuracy(number, url, engine_name)
+    accuracy(number, url)
   
   print("finish")
 
