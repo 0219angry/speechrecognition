@@ -11,16 +11,6 @@ def main():
   number = input()
   print("Enter 青空文庫 contents url")
   url = input()
-  # 音声認識engineの指定
-  print("Enter speech recognition engine/API name")
-  print("supported engine/API")
-  print("Google Speech Recognition | google")
-  print("Microsoft Azure Speech    | azure")
-  print("Tensorflow                | tensorflow")
-  print("----------------------------------------")
-  engine_name = input()
-  print("Do you want short mode? Short mode only calculate accuracy. [Y/n]")
-  short_mode = input()
   
   
   # 必要なディレクトリの作成
