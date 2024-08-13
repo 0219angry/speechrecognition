@@ -24,7 +24,7 @@ def recognize(number, engine_name, max_retries=5):
       else:
         print("Unsupported Speech Recognition engin/API")
 
-      with open("data/txt/"+"rd"+number+".txt",'w') as f:
+      with open("data/txt/"+"rd"+number+"_"+engine_name+".txt",'w') as f:
         f.write(script)
       print(script)
       break

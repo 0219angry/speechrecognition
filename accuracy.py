@@ -6,7 +6,7 @@ ignore_letters =  ["。","、","\n","\t","\r"," ","　","○","「","」","（",
 
 
 
-def calc_accuracy(number, ans, rec):
+def calc_accuracy(number, ans, rec, engine_name):
   N = len(ans) # 正解文の長さ
   delection_error = 0 # 削除誤り
   substitution_error = 0 # 置換誤り
@@ -21,7 +21,7 @@ def calc_accuracy(number, ans, rec):
   great_c_ans_result = 0 # 現在最良の一致した地点(正解文)
   great_c_rec_result = 0 # 現在最良の一致した地点(認識文)
   
-  f = open("data/acc/"+"rd"+number+".csv",'w')
+  f = open("data/acc/"+"rd"+number+"_"+engine_name+".csv",'w')
   f.write("error_type, answer, recognized, error_count, answer_start, answer_end, recog_start, recog_end\n")
   
   # 最小の誤り数でとれるものを採用する(そうしないと同じ文字があった時不適切な文字同士を同じものとみなす可能性がある)
@@ -96,7 +96,7 @@ def calc_accuracy(number, ans, rec):
   
 
 
-def accuracy(number, url):
+def accuracy(number, url,engine_name):
   
   response = requests.get(url)
   
@@ -108,10 +108,10 @@ def accuracy(number, url):
   
   answer_text = main_text.get_text()
   
-  with open("data/answer/rd"+number+".txt","w") as f:
+  with open("data/answer/rd"+number+"_"+engine_name+".txt","w") as f:
     f.write(answer_text)
   
-  with open("data/txt/"+"rd"+number+".txt",'r') as f:
+  with open("data/txt/"+"rd"+number+"_"+engine_name+".txt",'r') as f:
     recognized_text = f.read()
     
   formatted_answer = []
@@ -132,4 +132,4 @@ def accuracy(number, url):
       formatted_recog_text.append(l)
   print()
   
-  calc_accuracy(number, formatted_answer, formatted_recog_text)
+  calc_accuracy(number, formatted_answer, formatted_recog_text, engine_name)
